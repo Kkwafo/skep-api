@@ -41,7 +41,7 @@ async def run_agent(message: str, current_path: str, chat_history: Optional[List
     doc_text = doc_context.get_text()
     if doc_text:
         # Strict context limit for token saving
-        limit = 1500 
+        limit = 10000 
         doc_snippet = doc_text[:limit] + "..." if len(doc_text) > limit else doc_text
     else:
         doc_snippet = "N/A"
