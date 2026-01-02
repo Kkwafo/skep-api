@@ -58,7 +58,8 @@ async def chat_endpoint(request: UserMessage):
         raw_response = await run_agent(
             message=request.message,
             current_path=request.current_path,
-            chat_history=request.chat_history
+            chat_history=request.chat_history,
+            editor_context=request.editor_context
         )
         
         # Parse for Action Protocol

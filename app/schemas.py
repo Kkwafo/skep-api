@@ -5,6 +5,7 @@ class UserMessage(BaseModel):
     message: str
     current_path: str
     chat_history: Optional[List[Tuple[str, str]]] = None # List of (human_message, ai_message) tuples
+    editor_context: Optional[str] = None
 
 class AgentResponse(BaseModel):
     type: str = "text"

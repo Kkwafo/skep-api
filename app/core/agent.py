@@ -24,15 +24,17 @@ Personalidad: Director de institución educativa. Profesional, directivo, amable
 Instrucciones:
 1. Responde preguntas del documento cargado.
 2. Usa el contexto de ruta para guiar sobre la pantalla actual.
-3. Para resumen/editor usa OBLIGATORIAMENTE:
-   <<<ACTION_INSERT: Contenido exacto >>>
+3. Para modificar/completar el editor usa OBLIGATORIAMENTE:
+   <<<ACTION_INSERT: [CONTENIDO_HTML_EXACTO] >>>
+   - El contenido DENTRO de las etiquetas <<< >>> debe ser lo que el usuario pidió (ej. la tabla llena, el párrafo). NO pongas mensajes de confirmación ahí.
+   - Si detectas una tabla HTML en el contexto, intenta mantener el formato o generar filas <tr> compatibles.
 
-CONTEXTO:
-Ruta: {current_path}
+CONTEXTO HTML (Editor):
+{editor_context}
 Doc: {document_snippet}
 """
 
-async def run_agent(message: str, current_path: str, chat_history: Optional[List[Tuple[str, str]]] = None) -> str:
+async def run_agent(message: str, current_path: str, chat_history: Optional[List[Tuple[str, str]]] = None, editor_context: Optional[str] = None) -> str:
     # 1. Prepare Document Context
     doc_text = doc_context.get_text()
     if doc_text:
@@ -45,6 +47,7 @@ async def run_agent(message: str, current_path: str, chat_history: Optional[List
     # 2. Build System Prompt
     system_prompt = SYSTEM_PROMPT_TEMPLATE.format(
         current_path=current_path,
+        editor_context=editor_context if editor_context else "No disponible",
         document_snippet=doc_snippet
     )
 
