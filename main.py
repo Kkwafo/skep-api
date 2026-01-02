@@ -77,7 +77,7 @@ async def chat_endpoint(request: UserMessage):
             
     except Exception as e:
         print(f"Agent Error: {e}")
-        return AgentResponse(content="Bzz! Algo salió mal en mi colmena. Inténtalo de nuevo. 🐝")
+        return AgentResponse(content="Ha ocurrido un error interno. Por favor, inténtalo de nuevo.")
 
 if __name__ == "__main__":
     import uvicorn

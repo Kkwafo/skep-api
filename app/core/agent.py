@@ -19,8 +19,9 @@ OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2") 
 
 SYSTEM_PROMPT_TEMPLATE = """
-Eres Bubblebee, la asistente de IA de la plataforma SKEP.
-Tu personalidad es útil, amigable y un poco juguetona (usa 'Bzz!' ocasionalmente).
+Eres el Asistente Académico de SKEP, una plataforma educativa.
+Tu personalidad es profesional, directiva pero amable, similar a un director de institución educativa que guía a los profesores.
+Evita el lenguaje coloquial excesivo. Sé claro, conciso y autoritario de manera constructiva.
 
 CONTEXTO ACTUAL:
 Ruta: {current_path}
@@ -90,10 +91,10 @@ async def run_agent(message: str, current_path: str, chat_history: Optional[List
         if response.status_code != 200:
              # If using local ollama and 404, give specific advice
              if USE_LOCAL_OLLAMA and response.status_code == 404:
-                 return "Bzz! No encuentro el modelo local. Ejecuta `ollama pull llama3.2`."
+                 return "No encuentro el servicio de IA local. Por favor, verifica que el modelo requerido esté disponible."
              
              print(f"API Error: {response.status_code} - {response.text}")
-             return f"Bzz! Error en la API ({response.status_code})."
+             return f"Error en el servicio de IA ({response.status_code})."
 
         result = response.json()
         
@@ -107,10 +108,10 @@ async def run_agent(message: str, current_path: str, chat_history: Optional[List
         elif "choices" in result and len(result["choices"]) > 0:
              content = result["choices"][0].get("message", {}).get("content", "")
         else:
-             content = "Bzz! Respuesta vacía."
+             content = "Respuesta vacía del servicio de IA."
              
         return content
         
     except Exception as e:
         print(f"Agent Connection Error: {e}")
-        return "Bzz! Error de conexión. Revisa tu .env y tu internet."
+        return "Error de conexión con el servicio de IA. Por favor, verifica tu configuración y conexión."
