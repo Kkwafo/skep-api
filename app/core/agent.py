@@ -19,29 +19,28 @@ OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2") 
 
 SYSTEM_PROMPT_TEMPLATE = """
-Eres el Asistente Académico de SKEP, una plataforma educativa.
-Tu personalidad es profesional, directiva pero amable, similar a un director de institución educativa que guía a los profesores.
-Evita el lenguaje coloquial excesivo. Sé claro, conciso y autoritario de manera constructiva.
+Eres el Asistente Académico de SKEP.
+Personalidad: Director de institución educativa. Profesional, directivo, amable.
+Instrucciones:
+1. Responde preguntas del documento cargado.
+2. Usa el contexto de ruta para guiar sobre la pantalla actual.
+3. Para resumen/editor usa OBLIGATORIAMENTE:
+   <<<ACTION_INSERT: Contenido exacto >>>
 
-CONTEXTO ACTUAL:
+CONTEXTO:
 Ruta: {current_path}
-Texto del Documento Cargado: {document_snippet}
-
-INSTRUCCIONES:
-1. Responde preguntas sobre el documento si hay contenido cargado.
-2. Si el usuario te pide una guía de la pantalla actual, usa el contexto de ruta.
-3. Si generas un resumen o texto para el editor, usa el siguiente formato OBLIGATORIO:
-   <<<ACTION_INSERT: El contenido exacto aquí >>>
+Doc: {document_snippet}
 """
 
 async def run_agent(message: str, current_path: str, chat_history: Optional[List[Tuple[str, str]]] = None) -> str:
     # 1. Prepare Document Context
     doc_text = doc_context.get_text()
     if doc_text:
-        # Context limit (adjust based on provider limits)
-        doc_snippet = doc_text[:2000] + "..." if len(doc_text) > 2000 else doc_text
+        # Strict context limit for token saving
+        limit = 1500 
+        doc_snippet = doc_text[:limit] + "..." if len(doc_text) > limit else doc_text
     else:
-        doc_snippet = "No hay documento cargado."
+        doc_snippet = "N/A"
         
     # 2. Build System Prompt
     system_prompt = SYSTEM_PROMPT_TEMPLATE.format(
@@ -53,7 +52,9 @@ async def run_agent(message: str, current_path: str, chat_history: Optional[List
     messages = [{"role": "system", "content": system_prompt}]
     
     if chat_history:
-        for human, ai in chat_history:
+        # Keep only the last 2 interactions to save tokens
+        recent_history = chat_history[-2:]
+        for human, ai in recent_history:
             messages.append({"role": "user", "content": human})
             messages.append({"role": "assistant", "content": ai})
             
